@@ -1,0 +1,29 @@
+{
+  "name": "landpage-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "typeorm": "typeorm -d ./src/database/database.js",
+    "migrate:generate": "npm run typeorm -- migration:generate",
+    "migrate:create": "npm run typeorm -- migration:create",
+    "migrate:run": "npm run typeorm -- migration:run",
+    "migrate:revert": "npm run typeorm -- migration:revert",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.3",
+    "nodemon": "^3.1.10",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.25"
+  }
+}
