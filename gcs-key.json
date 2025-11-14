@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "soy-tower-477502-n9",
+  "private_key_id": "9aaf6a2ee060512988d47bf897e56b4204a82da4",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDrPitVs4giBc0L\n/7Os6nXcwn+e5cpE4D96mx3tcRyBCQWu9TauKRSucIEraf0OkYZKAK/M9hp8kPgP\nZA5Dxswnn3ezyHSAkgqYDSueli5mjokpzgwJAAuvTvEYv6kMkFHu5MTQWVr+zOt8\nOGxRU2aEzxaS1fEEKMmoFEkcQCVvW6ajL0ZST7BSqpeymKCoj9Jr3ylnTd7yqsOK\n+fojQYVwivfjSyfbN6uV4nOgkJzAFs+y/VEfNiWTZi8AEKhhfjAy487lkyCbt11J\nuE+nvLHs3C0YCl6vazq5enbf99NWlZM+XT3QGDcWVHpr++JI/UzcOOsngD0Evq5Q\nhHoWDTKHAgMBAAECggEAA2dGBjqPjM/LrHxEaQsyravMtTZQNliON+O4S5/4JcUa\nesexGlTy0nvt39HBPQLi+qgcOFlpKbCJPjkYMb0rD/mxKCiNcvIUoCg0n4SUYvHL\nTzpcFzc+dAiu2Uj7P6Nzjq1q9t62v8/5f4sWGhkcTG3t6YLvNpGxKogx70GIU8js\nZiCHShRTI7FRhqSwru4mLsM6omtiVnSK8RugTUWsSTf7Pal21l5KIRhGUdxqsb9D\nR0qxhL3v0KHBUpcYEIZy2zvRpWsJxN7LIrdv0KRnl6VJKhWBrSe+5G8x59NBOZRE\n86JKQb11kGZVPCWWmTTmvGtJDS+K9KDDcFkpSX5XEQKBgQD81Q5QsWQxpeIp15uz\nY7ziww9P/Lb5uOdvrMADAu56Do9bBrMhcaRcXhmtW6L0HvhYLZdYVUVB2tmm1/un\nCQf2zevmwkWzgJkOzRBhuhCX9J7P8mbL53hBC6vAYipf3D4b89nYPw3D4YN/bUG6\nodI+VMeil9BbmRYJP9OsxBECEQKBgQDuMLJIwgIpCXKOiPx6iJfG3nmGFTiZCl2/\nVI5F5vUSEmWvxIJKaALc6AbZ8TYMH4h6V18u5S1xZ5Ob6G5JZucosgyvD1zyA1eL\nO6he8eNMCkWx6l+8AGYpA6/ugod2wz3l7M4I572k9+pS1rnGD25kE23TkkWCbSEt\n7B/SxLLTFwKBgQDF0Lyejexim/NT4YnE1WhX014LqyJOSElrqrGgqY6EmRe4lIla\nxVtfmZBlfqkEb6bG9wTO7Ah/+gcI7zvJ+NruUzcbGS0HwLoARplmnPmWqqIG+RVM\nvBHucn8yypt03RELNcNf2hWfCLal4Inox+uDMTnxEO7IfAItwm6PYegcwQKBgHE6\nMOYpY8GCPjTHpc3R9OSSiY5VtCv8I4h6d49/NOy8Vh5x+cXJH+NHYUplQd4Nd2FA\n+3xdcXbBWAf7O8Ik6qoLyb/GO9bIA+uqFmXb8sMI9wyWb5/9SJMir5Vf82lfcqNE\nKMVO9HXhbECo1nLyjvV/zuuOUwCnQ+iCoLYezytNAoGBAOQnboN5d3poBqIUAUr9\neqfAFvWtiT/W4aK7zKEnM739DswwS76ck4RsofMMt7ecUyR/eZ8JFyzeq0XfzwzS\n4HACFyVZrKFnMjKfSCbKDAbRco38M13eGQkQRL/xq/JKPJJDtsj9Pf4gyz48d0km\n55QwHaJ80UMSPVmQDgWxluvw\n-----END PRIVATE KEY-----\n",
+  "client_email": "upload-servicos@soy-tower-477502-n9.iam.gserviceaccount.com",
+  "client_id": "114839522082789597855",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/upload-servicos%40soy-tower-477502-n9.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
