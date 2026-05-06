@@ -4,56 +4,73 @@
 */
 
 const { Router } = require('express');
+const multer = require('multer');
 
-// 1. Importe todos os seus controladores (usando 'require')
+// 1. Importe todos os seus controladores
 const ServicoController = require('../controller/ServicoController');
 const AgendamentoController = require('../controller/AgendamentoController');
 const QuestionarioController = require('../controller/QuestionarioController');
-// Verifique o nome/caminho correto do seu controlador de login
-const UsuarioController = require('../controller/UsuarioController'); 
+const UploadController = require('../controller/UploadController');
+const UsuarioController = require('../controller/UsuarioController');
+const RelatorioController = require('../controller/RelatorioController'); // ✅ NOVO
 
-// 2. Importe o seu middleware
+// 2. Importe o middleware de autenticação
 const authMiddleware = require('../middleware/authMiddleware');
 
+// 3. Configuração do Multer (armazenamento em memória)
+const multerConfig = {
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // Limite de 5MB
+  },
+};
+const upload = multer(multerConfig);
+
+// 4. Inicializa o roteador
 const routes = Router();
 
-// --- Rotas Públicas (para clientes) ---
+
+// --- Rotas Públicas (acesso sem login) ---
 
 routes.post('/register', UsuarioController.register);
+routes.post('/login', UsuarioController.login);
 
-// Login (Usuário)
-routes.post('/login', UsuarioController.login); // Assegure-se que UsuarioController.store é o seu método de login
-
-// Listar Serviços (Página de Serviços)
+// Listagem de serviços para o site
 routes.get('/servicos', ServicoController.index);
 
-// Salvar Agendamento (Formulário de Agendamento)
+// Formulários públicos
 routes.post('/agendamentos', AgendamentoController.store);
-
-// Salvar Questionário (Formulário do Questionário)
 routes.post('/questionario', QuestionarioController.store);
 
 
-// --- Rotas Privadas (para o Painel do Admin) ---
+// --- Rotas Privadas (acesso com autenticação) ---
 
-// Aplicamos o middleware de autenticação
-routes.use(authMiddleware); 
+routes.use(authMiddleware); // Protege todas as rotas abaixo
 
-// CRUD de Serviços (para o seu Painel.jsx)
-routes.post('/servicos', ServicoController.store);    // Criar
-routes.put('/servicos/:id', ServicoController.update);    // Atualizar
-routes.delete('/servicos/:id', ServicoController.delete); // Excluir
+// CRUD de serviços (Painel Admin)
+routes.post('/servicos', ServicoController.store);
+routes.put('/servicos/:id', ServicoController.update);
+routes.delete('/servicos/:id', ServicoController.delete);
 
-// (Opcional) Rota para o Admin ver os agendamentos no painel
+// Upload de imagens para GCS
+routes.post('/upload', upload.single('file'), UploadController.store);
+
+// Painel Admin: visualizar dados
 routes.get('/agendamentos-admin', AgendamentoController.index);
-
-
-// Rota para listar usuários (para o painel)
+routes.get('/questionarios-admin', QuestionarioController.index);
 routes.get('/usuarios', UsuarioController.listar);
-// Rota para ver o perfil logado
 routes.get('/perfil', UsuarioController.perfil);
-// (Opcional) Rota para o Admin ver as respostas dos questionários
-// routes.get('/questionarios-admin', QuestionarioController.index); 
 
-// 3. Exporte usando 'module.exports'
+// ✅ Nova rota: gerar relatório em PDF das respostas
+routes.get('/relatorio-questionarios', RelatorioController.gerarPDF);
+
+// DEPOIS: ESTA É A NOVA ROTA ADICIONADA
+routes.get('/relatorio-agendamentos', RelatorioController.gerarPDFAgendamentos); // Assumindo que o método se chama 'gerarPDFAgendamentos'
+
+// ✅ Novas rotas: exclusão de duplicados
+routes.delete('/agendamentos-duplicados', AgendamentoController.excluirDuplicados);
+routes.delete('/questionarios-duplicados', QuestionarioController.excluirDuplicados);
+
+
+// 5. Exporta as rotas
 module.exports = routes;
