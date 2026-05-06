@@ -1,0 +1,16 @@
+# Pastas de dependências (MUITO PESADAS - Nunca enviar)
+node_modules/
+
+# Pasta de uploads (As fotos de teste da clínica não devem ir para o código fonte)
+/uploads/
+
+# Ficheiros de ambiente (Onde guardas senhas do banco de dados)
+.env
+
+# Pastas de build (O código pronto para o site)
+/dist
+/build
+
+# Ficheiros do sistema
+.DS_Store
+Thumbs.db

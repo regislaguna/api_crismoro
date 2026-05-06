@@ -1,59 +1,95 @@
 /*
 * Ficheiro: src/routes/index.js
-* (CORRIGIDO para usar 'require' - CommonJS)
+* Documentação: Rotas da aplicação com intercetador avançado de erros do Multer.
 */
 
 const { Router } = require('express');
 
-// 1. Importe todos os seus controladores (usando 'require')
+// 1. Importação dos Controladores
 const ServicoController = require('../controller/ServicoController');
 const AgendamentoController = require('../controller/AgendamentoController');
 const QuestionarioController = require('../controller/QuestionarioController');
-// Verifique o nome/caminho correto do seu controlador de login
 const UsuarioController = require('../controller/UsuarioController'); 
+const RelatorioController = require('../controller/RelatorioController');
+const ProntuarioController = require('../controller/ProntuarioController');
 
-// 2. Importe o seu middleware
+const multer = require('multer');
+const multerConfig = require('../configs/multer');
+const upload = multer(multerConfig);
+
+// 2. Importação do Middleware de Autenticação
 const authMiddleware = require('../middleware/authMiddleware');
 
 const routes = Router();
 
-// --- Rotas Públicas (para clientes) ---
-
+// ==========================================
+// --- ROTAS PÚBLICAS (Para Clientes) ---
+// ==========================================
 routes.post('/register', UsuarioController.register);
-
-// Login (Usuário)
-routes.post('/login', UsuarioController.login); // Assegure-se que UsuarioController.store é o seu método de login
-
-// Listar Serviços (Página de Serviços)
+routes.post('/login', UsuarioController.login);
 routes.get('/servicos', ServicoController.index);
-
-// Salvar Agendamento (Formulário de Agendamento)
 routes.post('/agendamentos', AgendamentoController.store);
-
-// Salvar Questionário (Formulário do Questionário)
 routes.post('/questionario', QuestionarioController.store);
 
 
-// --- Rotas Privadas (para o Painel do Admin) ---
+// ==========================================
+// --- ROTAS PRIVADAS (Para o Painel Admin) ---
+// ==========================================
+routes.use(authMiddleware); // <-- Segurança ativada
 
-// Aplicamos o middleware de autenticação
-routes.use(authMiddleware); 
+routes.get('/relatorio-agendamentos', RelatorioController.gerarAgendamentos);
+routes.get('/relatorio-questionarios', RelatorioController.gerarQuestionarios);
 
-// CRUD de Serviços (para o seu Painel.jsx)
-routes.post('/servicos', ServicoController.store);    // Criar
-routes.put('/servicos/:id', ServicoController.update);    // Atualizar
-routes.delete('/servicos/:id', ServicoController.delete); // Excluir
+// --------------------------------------------------------
+// 🕵️ ESPIONAGEM DE UPLOAD: Rota de Criação de Serviço
+// --------------------------------------------------------
+routes.post('/servicos', (req, res, next) => {
+  // Chamamos o Multer manualmente para podermos capturar o erro
+  const processarUpload = upload.single('image');
+  
+  processarUpload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      // Se o Multer falhar, imprimimos a confissão exata no terminal
+      console.log("❌ [MULTER ERROR]:", err.message);
+      console.log("👉 O CAMPO QUE CAUSOU O PROBLEMA FOI:", err.field);
+      
+      // Enviamos a resposta para o navegador (Aba Network) para tu veres logo o problema
+      return res.status(400).json({ 
+        erro: "Erro de etiqueta de ficheiro.", 
+        mensagem_multer: err.message,
+        campo_rejeitado: err.field 
+      });
+    } else if (err) {
+      // Erro desconhecido não relacionado ao Multer
+      console.log("❌ [ERRO GERAL]:", err);
+      return res.status(500).json({ erro: "Erro interno no upload." });
+    }
+    
+    // Se não houve erros e as etiquetas combinam, passamos a bola ao Controlador!
+    next();
+  });
+}, ServicoController.store);
 
-// (Opcional) Rota para o Admin ver os agendamentos no painel
+// CRUD de Serviços (Restantes)
+routes.put('/servicos/:id', upload.single('image'), ServicoController.update);  
+routes.delete('/servicos/:id', ServicoController.delete); 
+
+// Rota de Agendamentos
 routes.get('/agendamentos-admin', AgendamentoController.index);
 
-
-// Rota para listar usuários (para o painel)
+// Rotas de Usuários
 routes.get('/usuarios', UsuarioController.listar);
-// Rota para ver o perfil logado
 routes.get('/perfil', UsuarioController.perfil);
-// (Opcional) Rota para o Admin ver as respostas dos questionários
-// routes.get('/questionarios-admin', QuestionarioController.index); 
 
-// 3. Exporte usando 'module.exports'
+// Rota dos questionários
+routes.get('/questionarios-admin', QuestionarioController.index); 
+
+// CRUD de Prontuários
+routes.get('/prontuarios', ProntuarioController.index);
+routes.get('/prontuarios/:id', ProntuarioController.show);
+routes.post('/prontuarios', ProntuarioController.store);
+routes.put('/prontuarios/:id', ProntuarioController.update);
+routes.delete('/prontuarios/:id', ProntuarioController.delete);
+
+// 3. Exportação do Módulo
 module.exports = routes;
