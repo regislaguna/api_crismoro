@@ -4,24 +4,28 @@
 */
 const jwt = require('jsonwebtoken');
 // const Usuarios = require('../models/Usuarios'); // Você não está a usar isto, pode apagar
-const SECRET_KEY = 'S3CR3TK3Y'; // Lembre-se de mover isto para o seu .env!
 
 const AppDataSource = require('../database/database'); // 
 const Usuario = require("../app/Entities/Usuario");
 // DEIXE ESTA LINHA COMENTADA OU APAGUE-A. NÃO PODE FICAR AQUI.
 // const usuarioRepository = AppDataSource.getRepository(Usuario); 
 
+const authConfig = require('../../configs/auth'); // Importe o seu arquivo de config
+
+// Em vez de 'S3CR3TK3Y', use a chave que vem da sua config
+const { secret } = authConfig().jwt; 
+
 const authMiddleware = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if(!authHeader) {
-        return res.status(401).json({erro: 'Header authorization nao encontrado'})
-    }
-    // estrategia de autorizacao usando "Bearer TOKEN"
-    const parts = authHeader.split(' ');
-    console.log(parts)
-    if(parts.length !== 2) {
-        return res.status(401).json({ erro: 'Token com formato invalido'})
-    }
+    // ... resto do código igual ...
+    
+    // Na hora de verificar, use a constante 'secret'
+    jwt.verify(token, secret, async (err, decoded) => {
+        if(err) {
+            return res.status(401).json({erro: 'Token invalido ou expirado.'})
+        }
+        // ...
+    });
+
     const [scheme, token] = parts;
 
     // A verificação do 'scheme' (Bearer) também é uma boa prática

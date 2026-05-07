@@ -2,10 +2,7 @@ const dotenv = require('dotenv')
 
 dotenv.config()
 
-const authConfig = () => ({
-    jwt: {
-        secret: process.env.JWT_SECRET ?? 'default_secret'
-    }
-})
+const config = require('./configs/auth');
+const secret = config().jwt.secret; // Note os parênteses ()
 
 module.exports = authConfig
