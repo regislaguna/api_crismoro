@@ -1,17 +1,24 @@
+/*
+ * Arquivo: src/index.js
+ * Descrição: Ponto de entrada da API. Configura conexão com banco,
+ * segurança (CORS), rotas e arquivos públicos.
+ */
+
 require('dotenv').config();
 const express = require('express');
 const rotas = require('./routes');
-const cors = require('cors'); // npm i cors
+const cors = require('cors'); 
 const AppDataSource = require('./database/database');
 const appConfig = require('./configs/app');
-const path = require('path'); // Módulo nativo do Node.js para lidar com caminhos de arquivos
+const path = require('path');
 
+// 1. Inicialização do Banco de Dados
 const startDatabase = async () => {
     try {
         await AppDataSource.initialize();
-        console.log('Conectado ao banco de dados com sucesso!'); // Pequena correção ortográfica aqui
+        console.log('Conectado ao banco de dados com sucesso!');
     } catch (error) {
-        console.log(error);
+        console.error('Erro ao conectar ao banco:', error);
         return;
     }
 }
@@ -20,27 +27,28 @@ startDatabase();
 
 const server = express();
 
-// Configurações básicas de segurança e leitura de dados
+// 2. Configurações Globais (Middlewares de Base)
 server.use(cors());
 server.use(express.json());
 
-// --- NOVA IMPLEMENTAÇÃO: Servindo arquivos estáticos (Imagens) ---
-// Transforma a pasta 'uploads' em uma rota pública. 
-// Tudo que o Multer salvar lá poderá ser visto pelo site.
+/* 
+ * 3. ACESSO PÚBLICO ÀS IMAGENS (Ajuste Crítico)
+ * Esta linha deve vir ANTES de server.use(rotas).
+ * Ela permite que o navegador acesse as fotos sem precisar de Token de login.
+ */
 server.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads'))); 
 
-// Rotas da aplicação
+// 4. Rotas da Aplicação
+// As rotas dentro deste arquivo podem conter o middleware de autenticação.
 server.use(rotas);
 
-// Tratamento para rotas não mapeadas (Sempre deve ficar por último)
+// 5. Tratamento de Erros (Rota 404)
 server.use((req, res) => {
     res.status(404).send('Rota não encontrada');
 });
 
+// 6. Configuração da Porta e Inicialização
 const { name, port } = appConfig();
-
-// O Railway injeta automaticamente a variável process.env.PORT. 
-// Se ela existir, usamos ela. Se não (localmente), usamos a do appConfig.
 const PORT_TO_LISTEN = process.env.PORT || port || 3333;
 
 server.listen(PORT_TO_LISTEN, '0.0.0.0', () => {
