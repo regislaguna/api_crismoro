@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 require('dotenv').config()
 
 const dbConfig = () => ({
@@ -15,17 +14,4 @@ const dbConfig = () => ({
     logging: true // Isso vai mostrar o SQL no seu terminal
 })
 
-=======
-require('dotenv').config()
-
-const dbConfig = () => ({
-    type: process.env.DB_TYPE ?? 'mysql',
-    port: Number(process.env.DB_PORT) || 3306,
-    host: process.env.DB_HOST ?? 'localhost',
-    username: process.env.DB_USERNAME ?? '',
-    password: process.env.DB_PASSWORD ?? '',
-    database: process.env.DB_DATABASE ?? 'defaultcm'
-})
-
->>>>>>> 176a22d9a86985f120464dcb42d1ce07083b1364
 module.exports = dbConfig
