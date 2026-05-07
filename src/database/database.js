@@ -33,6 +33,7 @@ const AppDataSource = new DataSource({
 })
 
 module.exports = AppDataSource;
+<<<<<<< HEAD
 =======
 require('dotenv').config();
 require('reflect-metadata');
@@ -54,3 +55,5 @@ const AppDataSource = new DataSource({
 
 module.exports = AppDataSource;
 >>>>>>> 176a22d9a86985f120464dcb42d1ce07083b1364
+=======
+>>>>>>> 599f8eecc4b76589dd22034310b86113f4c6c27f

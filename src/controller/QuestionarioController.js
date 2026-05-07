@@ -72,6 +72,7 @@ class QuestionarioController {
 }
 
 module.exports = new QuestionarioController();
+<<<<<<< HEAD
 =======
 const AppDataSource = require('../database/database');
 const RespostaQuestionario = require('../app/Entities/RespostaQuestionario');
@@ -132,3 +133,5 @@ const QuestionarioController = {
 
 module.exports = QuestionarioController;
 >>>>>>> 176a22d9a86985f120464dcb42d1ce07083b1364
+=======
+>>>>>>> 599f8eecc4b76589dd22034310b86113f4c6c27f

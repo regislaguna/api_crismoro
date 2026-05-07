@@ -94,6 +94,7 @@ routes.delete('/prontuarios/:id', ProntuarioController.delete);
 
 // 3. Exportação do Módulo
 module.exports = routes;
+<<<<<<< HEAD
 =======
 /*
 * Ficheiro: src/routes/index.js
@@ -172,3 +173,5 @@ routes.delete('/questionarios-duplicados', QuestionarioController.excluirDuplica
 // 5. Exporta as rotas
 module.exports = routes;
 >>>>>>> 176a22d9a86985f120464dcb42d1ce07083b1364
+=======
+>>>>>>> 599f8eecc4b76589dd22034310b86113f4c6c27f
