@@ -18,13 +18,15 @@ routes.get('/servicos', ServicoController.index);
 routes.post('/agendamentos', AgendamentoController.store);
 routes.post('/questionario', QuestionarioController.store);
 
-// --- Rotas Privadas (Admin) ---
-routes.use(authMiddleware); 
-
 // ATENÇÃO AQUI: Verifique se o seu Frontend envia a foto com o nome 'image' ou 'foto'.
 // Se for 'foto', mude para upload.single('foto')
 routes.post('/servicos', upload.single('image'), ServicoController.store); 
 routes.put('/servicos/:id', upload.single('image'), ServicoController.update);
+
+// --- Rotas Privadas (Admin) ---
+routes.use(authMiddleware); 
+
+
 routes.delete('/servicos/:id', ServicoController.delete);
 
 routes.get('/agendamentos-admin', AgendamentoController.index);
