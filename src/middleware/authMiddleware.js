@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const AppDataSource = require('../database/database'); 
 const Usuario = require("../app/Entities/Usuario");
-const authConfig = require('../../configs/auth'); // Ajuste o caminho se necessário
+const authConfig = require('../configs/auth'); // Ajuste o caminho se necessário
 
 const { secret } = authConfig().jwt; 
 
