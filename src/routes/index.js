@@ -1,19 +1,7 @@
 const { Router } = require('express');
-const multer = require('multer'); // 1. Importe o Multer
-const path = require('path');
 
-// Configuração do armazenamento das fotos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // As fotos vão para a pasta 'uploads'
-  },
-  filename: (req, file, cb) => {
-    // Gera um nome único: data-nomeoriginal.jpg
-    cb(null, Date.now() + '-' + file.originalname);
-  }
-});
-
-const upload = multer({ storage });
+// Importe o seu multer recém-criado
+const upload = require('../configs/multer'); 
 
 const ServicoController = require('../controller/ServicoController');
 const AgendamentoController = require('../controller/AgendamentoController');
@@ -33,10 +21,9 @@ routes.post('/questionario', QuestionarioController.store);
 // --- Rotas Privadas (Admin) ---
 routes.use(authMiddleware); 
 
-// --- AQUI ESTÁ A CORREÇÃO CRÍTICA ---
-// Adicionamos 'upload.single('image')' para ele entender o formulário com foto
+// ATENÇÃO AQUI: Verifique se o seu Frontend envia a foto com o nome 'image' ou 'foto'.
+// Se for 'foto', mude para upload.single('foto')
 routes.post('/servicos', upload.single('image'), ServicoController.store); 
-
 routes.put('/servicos/:id', upload.single('image'), ServicoController.update);
 routes.delete('/servicos/:id', ServicoController.delete);
 
