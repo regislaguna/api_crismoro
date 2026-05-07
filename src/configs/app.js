@@ -4,7 +4,7 @@ dotenv.config()
 
 const appConfig = () => ({
     name: process.env.APP_NAME ?? 'API DEFAULT',
-    port: process.env.APP_PORT || 3333,
+    port: process.env.APP_PORT || process.env.APP_PORT || 3333,
     environment: process.env.NODE_ENV ?? 'development'
 })
 
