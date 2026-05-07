@@ -31,12 +31,11 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
-/* 
- * 3. ACESSO PÚBLICO ÀS IMAGENS (Ajuste Crítico)
- * Esta linha deve vir ANTES de server.use(rotas).
- * Ela permite que o navegador acesse as fotos sem precisar de Token de login.
- */
-server.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads'))); 
+// No seu src/index.js do Backend
+const path = require('path');
+
+// Esta linha é a "chave" para o Railway encontrar a pasta uploads
+server.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // 4. Rotas da Aplicação
 // As rotas dentro deste arquivo podem conter o middleware de autenticação.
