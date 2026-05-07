@@ -1,52 +1,50 @@
-/*
-* Ficheiro: src/app/middleware/authMiddleware.js
-* (CORRIGIDO - getRepository movido para dentro da função)
-*/
 const jwt = require('jsonwebtoken');
-// const Usuarios = require('../models/Usuarios'); // Você não está a usar isto, pode apagar
-const SECRET_KEY = 'S3CR3TK3Y'; // Lembre-se de mover isto para o seu .env!
+const SECRET_KEY = process.env.JWT_SECRET;
 
-const AppDataSource = require('../database/database'); // 
+const AppDataSource = require('../database/database');
 const Usuario = require("../app/Entities/Usuario");
-// DEIXE ESTA LINHA COMENTADA OU APAGUE-A. NÃO PODE FICAR AQUI.
-// const usuarioRepository = AppDataSource.getRepository(Usuario); 
 
 const authMiddleware = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if(!authHeader) {
-        return res.status(401).json({erro: 'Header authorization nao encontrado'})
-    }
-    // estrategia de autorizacao usando "Bearer TOKEN"
-    const parts = authHeader.split(' ');
-    console.log(parts)
-    if(parts.length !== 2) {
-        return res.status(401).json({ erro: 'Token com formato invalido'})
-    }
-    const [scheme, token] = parts;
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ erro: 'Header authorization não encontrado' });
+  }
 
-    // A verificação do 'scheme' (Bearer) também é uma boa prática
-    if (!/^Bearer$/i.test(scheme)) {
-        return res.status(401).json({ erro: 'Token mal formatado' });
+  const parts = authHeader.split(' ');
+  if (parts.length !== 2) {
+    return res.status(401).json({ erro: 'Token com formato inválido' });
+  }
+
+  const [scheme, token] = parts;
+  if (!/^Bearer$/i.test(scheme)) {
+    return res.status(401).json({ erro: 'Token mal formatado' });
+  }
+
+  jwt.verify(token, SECRET_KEY, async (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ erro: 'Token inválido ou expirado.' });
     }
 
-    jwt.verify(token, SECRET_KEY, async (err, decoded) => {
-        if(err) {
-            return res.status(401).json({erro: 'Token invalido ou expirado.'})
-        }
+    if (!AppDataSource.isInitialized) {
+      return res.status(500).json({ erro: 'DataSource não inicializado' });
+    }
 
-        // --- CORREÇÃO APLICADA AQUI ---
-        // DEPOIS: Mova o getRepository para DENTRO da função
-        const usuarioRepository = AppDataSource.getRepository(Usuario);
-        // --- FIM DA CORREÇÃO ---
+    try {
+      const usuarioRepository = AppDataSource.getRepository(Usuario);
+      const usuario = await usuarioRepository.findOneBy({ id: decoded.id });
 
-        const usuario = await usuarioRepository.findOneBy({id: decoded.id});
-        if(!usuario) {
-            return res.status(401).json({ erro: 'usuario do token nao encontrado'})
-        }
-        req.usuarioId = usuario.id;
+      if (!usuario) {
+        return res.status(401).json({ erro: 'Usuário do token não encontrado' });
+      }
 
-        return next();
-    } )
-}
+      req.usuarioId = usuario.id;
+      console.log('✅ Usuário autenticado:', usuario.id);
+      return next();
+    } catch (error) {
+      console.error('Erro no authMiddleware:', error);
+      return res.status(500).json({ erro: 'Erro interno na autenticação' });
+    }
+  });
+};
 
 module.exports = authMiddleware;
