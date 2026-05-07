@@ -1,42 +1,51 @@
-/*
-* Ficheiro: src/index.js
-* (O ficheiro principal que inicia a sua API)
-*/
-
-// 1. Carrega o .env ANTES de tudo
+// --- DOCUMENTAÇÃO E IMPORTAÇÕES ---
 require('dotenv').config();
-
-// 2. Importa o Express e o Cors
 const express = require('express');
-const cors = require('cors');
-
-// 3. Importa a ligação da Base de Dados (sem inicializar ainda)
+const rotas = require('./routes');
+const cors = require('cors'); // npm i cors
 const AppDataSource = require('./database/database');
+const appConfig = require('./configs/app');
 
-// 4. Importa as suas Rotas (o ficheiro routes/index.js)
-const routes = require('./routes');
+// 1. Nova Importação: 'path' é nativo do Node.js e ajuda a encontrar pastas
+const path = require('path'); 
 
-// 5. Cria a aplicação Express
-const app = express();
+// --- INICIALIZAÇÃO DA BASE DE DADOS ---
+const startDatabase = async () => {
+    try {
+        await AppDataSource.initialize();
+        console.log('Conectado ao banco de dados com sucesso');
+    } catch (error) {
+        console.log(error);
+        return;
+    }
+}
 
-// 6. Configura os Middlewares
-app.use(cors()); // Permite que o seu Frontend (React) aceda a esta API
-app.use(express.json()); // Permite à API ler JSON (essencial para req.body)
+startDatabase();
 
-// 7. Usa o seu ficheiro de rotas
-app.use(routes);
+// --- CONFIGURAÇÃO DO SERVIDOR ---
+const server = express();
+server.use(cors());
+server.use(express.json());
 
-// 8. Define a porta (lê a porta 3333 do seu .env)
-const port = process.env.APP_PORT || 3001;
+// ==========================================
+// 2. NOVO CÓDIGO: PERMISSÃO DE ARQUIVOS ESTÁTICOS
+// ==========================================
+// Cria uma rota pública para a pasta de imagens.
+// Se este teu ficheiro estiver dentro de uma pasta 'src', usamos '..' para voltar à raiz onde a pasta 'uploads' foi criada.
+server.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads')));
 
-// 9. Inicializa o banco de dados e só então inicia o servidor
-AppDataSource.initialize()
-  .then(() => {
-    console.log('📦 Data Source inicializado com sucesso!');
-    app.listen(port, () => {
-      console.log(`🚀 API LandPage rodando na porta ${port}`);
-    });
-  })
-  .catch((err) => {
-    console.error('❌ Falha ao inicializar o Data Source:', err);
-  });
+
+// --- ROTAS DA API ---
+// É importante que as rotas fiquem abaixo do express.static
+server.use(rotas);
+
+// --- ROTA DE FALLBACK (ERRO 404) ---
+server.use((req, res) => {
+    res.send('rota não encontrada');
+});
+
+// --- INÍCIO DO SERVIDOR ---
+const { name, port } = appConfig();
+server.listen(port, () => {
+    console.log(`${name} rodando na porta ${port}`);
+});

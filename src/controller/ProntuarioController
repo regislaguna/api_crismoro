@@ -1,0 +1,162 @@
+/*
+* Ficheiro: src/controller/ProntuarioController.js
+* Documentação: Controlador atualizado para suportar conversão segura de JSON
+* para a linha do tempo evolutiva (historico_tratamentos).
+*/
+const AppDataSource = require('../database/database');
+const Prontuario = require('../app/Entities/Prontuario');
+const Agendamento = require('../app/Entities/Agendamento'); 
+const RespostaQuestionario = require('../app/Entities/RespostaQuestionario');
+
+// --- FUNÇÃO DE PROGRAMAÇÃO DEFENSIVA ---
+// Garante que o texto guardado no MySQL é convertido para Array com segurança.
+// Se houver algum erro de formatação, devolve uma lista vazia para não quebrar o React.
+const parseSeguro = (valor) => {
+  if (!valor) return [];
+  try {
+    return JSON.parse(valor);
+  } catch (e) {
+    console.warn("Aviso: Falha ao converter o histórico de tratamentos.", e);
+    return [];
+  }
+};
+
+class ProntuarioController {
+  
+  // ==========================================
+  // 1. Listar todos os prontuários
+  // ==========================================
+  async index(req, res) {
+    try {
+      const repository = AppDataSource.getRepository(Prontuario);
+      const prontuarios = await repository.find({
+        order: { createdAt: "DESC" }
+      });
+
+      // Mapeia todos os prontuários para converter a string JSON de volta para Array
+      const prontuariosConvertidos = prontuarios.map(p => ({
+        ...p,
+        historico_tratamentos: parseSeguro(p.historico_tratamentos)
+      }));
+
+      return res.status(200).json(prontuariosConvertidos);
+    } catch (err) {
+      console.error("Erro no index de Prontuários:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  // ==========================================
+  // 2. Mostrar o Dossiê Completo de 1 Paciente
+  // ==========================================
+  async show(req, res) {
+    try {
+      const { id } = req.params;
+      const repository = AppDataSource.getRepository(Prontuario);
+      
+      const prontuario = await repository.findOneBy({ id: parseInt(id) });
+      if (!prontuario) return res.status(404).json({ error: 'Prontuário não encontrado.' });
+
+      // Converte a string da base de dados para um Array legível pelo frontend
+      prontuario.historico_tratamentos = parseSeguro(prontuario.historico_tratamentos);
+
+      let historicoAgendamentos = [];
+      let historicoQuestionarios = [];
+
+      if (prontuario.email || prontuario.telefone) {
+        const agendamentoRepo = AppDataSource.getRepository(Agendamento);
+        const questionarioRepo = AppDataSource.getRepository(RespostaQuestionario);
+
+        const busca = prontuario.email ? { email: prontuario.email } : { telefone: prontuario.telefone };
+
+        historicoAgendamentos = await agendamentoRepo.find({ where: busca });
+        historicoQuestionarios = await questionarioRepo.find({ where: busca });
+      }
+
+      return res.status(200).json({
+        ...prontuario,
+        agendamentos: historicoAgendamentos,
+        questionarios: historicoQuestionarios
+      });
+
+    } catch (err) {
+      console.error("Erro no show de Prontuários:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  // ==========================================
+  // 3. Criar Novo Prontuário
+  // ==========================================
+  async store(req, res) {
+    try {
+      const repository = AppDataSource.getRepository(Prontuario);
+      
+      if (!req.body.nome) return res.status(400).json({ error: 'O nome é obrigatório.' });
+
+      // Prepara os dados para salvar, convertendo o Array do React numa String para o MySQL
+      const dadosParaSalvar = {
+        ...req.body,
+        historico_tratamentos: req.body.historico_tratamentos 
+          ? JSON.stringify(req.body.historico_tratamentos) 
+          : '[]'
+      };
+
+      const novoProntuario = repository.create(dadosParaSalvar);
+      await repository.save(novoProntuario);
+
+      // Devolve o registo acabado de criar
+      return res.status(201).json(novoProntuario);
+    } catch (err) {
+      console.error("Erro no store de Prontuários:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  // ==========================================
+  // 4. Atualizar Prontuário Existente
+  // ==========================================
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const repository = AppDataSource.getRepository(Prontuario);
+      
+      const prontuario = await repository.findOneBy({ id: parseInt(id) });
+      if (!prontuario) return res.status(404).json({ error: 'Prontuário não encontrado.' });
+
+      // Se o Frontend enviar um novo histórico, convertemos para String antes de atualizar
+      const dadosParaAtualizar = { ...req.body };
+      if (req.body.historico_tratamentos) {
+        dadosParaAtualizar.historico_tratamentos = JSON.stringify(req.body.historico_tratamentos);
+      }
+
+      repository.merge(prontuario, dadosParaAtualizar);
+      const resultado = await repository.save(prontuario);
+      
+      return res.status(200).json(resultado);
+    } catch (err) {
+      console.error("Erro no update de Prontuários:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  // ==========================================
+  // 5. Excluir Prontuário
+  // ==========================================
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const repository = AppDataSource.getRepository(Prontuario);
+      
+      const resultado = await repository.delete(id);
+      if (resultado.affected === 0) return res.status(404).json({ error: 'Prontuário não encontrado.' });
+      
+      return res.status(204).send();
+    } catch (err) {
+      console.error("Erro no delete de Prontuários:", err);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+}
+
+module.exports = new ProntuarioController();
