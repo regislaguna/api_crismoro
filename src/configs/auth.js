@@ -1,8 +1,10 @@
-const dotenv = require('dotenv')
+const dotenv = require('dotenv');
+dotenv.config();
 
-dotenv.config()
+const authConfig = () => ({
+    jwt: {
+        secret: process.env.JWT_SECRET || 'S3CR3TK3Y'
+    }
+});
 
-const config = require('./configs/auth');
-const secret = config().jwt.secret; // Note os parênteses ()
-
-module.exports = authConfig
+module.exports = authConfig;

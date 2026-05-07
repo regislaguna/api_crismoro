@@ -10,7 +10,7 @@ const Usuario = require("../app/Entities/Usuario");
 // DEIXE ESTA LINHA COMENTADA OU APAGUE-A. NÃO PODE FICAR AQUI.
 // const usuarioRepository = AppDataSource.getRepository(Usuario); 
 
-const authConfig = require('../../configs/auth'); // Importe o seu arquivo de config
+const authConfig = require('../configs/auth'); // Importe o seu arquivo de config
 
 // Em vez de 'S3CR3TK3Y', use a chave que vem da sua config
 const { secret } = authConfig().jwt; 
