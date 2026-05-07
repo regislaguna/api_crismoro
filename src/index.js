@@ -26,6 +26,11 @@ server.use((req, res) => {
     res.send('rota não encontrada')
 });
 const { name, port } = appConfig();
-server.listen(port, () => {
-    console.log(`${name} rodando na porta ${port}`)
+
+// O Railway injeta automaticamente a variável process.env.PORT. 
+// Se ela existir, usamos ela. Se não (localmente), usamos a do appConfig.
+const PORT_TO_LISTEN = process.env.PORT || port || 3333;
+
+server.listen(PORT_TO_LISTEN, '0.0.0.0', () => {
+    console.log(`${name} rodando na porta ${PORT_TO_LISTEN}`);
 });
