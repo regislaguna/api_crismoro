@@ -1,16 +1,17 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
 const rotas = require('./routes');
 const cors = require('cors'); // npm i cors
 const AppDataSource = require('./database/database');
 const appConfig = require('./configs/app');
+const path = require('path'); // Módulo nativo do Node.js para lidar com caminhos de arquivos
 
 const startDatabase = async () => {
     try {
         await AppDataSource.initialize();
-        console.log('Conectado ao banco de ados com sucesso')
+        console.log('Conectado ao banco de dados com sucesso!'); // Pequena correção ortográfica aqui
     } catch (error) {
-        console.log(error)
+        console.log(error);
         return;
     }
 }
@@ -18,13 +19,24 @@ const startDatabase = async () => {
 startDatabase();
 
 const server = express();
-server.use(cors())
-server.use(express.json())
 
+// Configurações básicas de segurança e leitura de dados
+server.use(cors());
+server.use(express.json());
+
+// --- NOVA IMPLEMENTAÇÃO: Servindo arquivos estáticos (Imagens) ---
+// Transforma a pasta 'uploads' em uma rota pública. 
+// Tudo que o Multer salvar lá poderá ser visto pelo site.
+server.use('/uploads', express.static(path.resolve(__dirname, '..', 'uploads'))); 
+
+// Rotas da aplicação
 server.use(rotas);
+
+// Tratamento para rotas não mapeadas (Sempre deve ficar por último)
 server.use((req, res) => {
-    res.send('rota não encontrada')
+    res.status(404).send('Rota não encontrada');
 });
+
 const { name, port } = appConfig();
 
 // O Railway injeta automaticamente a variável process.env.PORT. 
